@@ -51,7 +51,7 @@ def scrape_followers(account, browser, mode):
     
     # If mode == 1 get the people that follow you, else the people you follow
     if mode == 1:
-        print("\tLoading people that I follow")
+        print("\tLoading the people that I follow")
         link = "following"
         listXPath = "//li[3]/a/span"
         print("\tFollowing found -> ")
@@ -65,40 +65,34 @@ def scrape_followers(account, browser, mode):
     browser.find_element_by_partial_link_text(link).click()    
     # Wait for the modal to load    
     waiter.find_element(browser, "//div[@role='dialog']", by=XPATH)    
-    # Get the following / followers count
     totalCount = int(browser.find_element_by_xpath(listXPath).text)
-    print("\t", totalCount)
+    print("\t{0}".format(totalCount))
     
-    # Taking advange of CSS's nth-child functionality
+    # Use the  CSS nth-child behavior to get n children
     follower_css = "ul div li:nth-child({}) a.notranslate" 
     peopleSet = set()
     
-    # Create and return a set of all the followers
-    # Insta loads the followers in groups of 12 so we get the followers and then
-    # force the modal to scroll down so that it will render the next 12
-    # this is not efficient as the follower number grows up -> O(x^2) runtime at least
-    stepSize = 8
+    # Create and return a set of all the following/followers
+    # Insta loads the followers by groups
+    # force the modal to scroll down to the next group
+    stepSize = 6
     for instaGroup in itertools.count(start=1, step=stepSize):
-        for follower_index in range(instaGroup, instaGroup + stepSize):
-            if follower_index > totalCount:
+        for followerIndex in range(instaGroup, instaGroup + stepSize):
+            # Avoid index out of bounds
+            if followerIndex > totalCount:
                 return peopleSet
                 
-            text = waiter.find_element(browser, follower_css.format(follower_index)).text
-            peopleSet.add(text)
-            print("follower name is - {0}".format(text))
+            followerName = waiter.find_element(browser, follower_css.format(followerIndex)).text
+            peopleSet.add(followerName)
+            print("follower {0} is - {1}".format(followerIndex, followerName))
             
-        print("scrolling")
-        # + 11 instead of the 12
-        last_follower = waiter.find_element(browser, follower_css.format(instaGroup+stepSize+1))
-        print("last follower is - {0}".format(last_follower))
-        browser.execute_script("arguments[0].scrollIntoView();", last_follower)
-        sleep(3)
-        
-        if (instaGroup > stepSize * 4):
-            print("returning set instaGroup is - {0}".format(instaGroup))
-            return peopleSet
+        # We should scroll past the last follower we found
+        lastFollower = waiter.find_element(browser, follower_css.format(instaGroup+stepSize-1))
+        #print("last follower is - {0}".format(lastFollower.text))
+        browser.execute_script("arguments[0].scrollIntoView();", lastFollower)
+        sleep(1)
     
-    # If there is no one  in the set
+    # If there is no one in the set. Big F if no one follows you my dude
     return peopleSet
     
 # Function to unfollow the given person
@@ -147,10 +141,11 @@ def main():
         print("Logged in into the account {0} | password {1}"\
         .format(username, password) )
 
-        # Get a list of that follow me
+        # Get a list of people that follow me. Mode 2 gets the people that follow me
         followers = scrape_followers(username, browser, 2)     
         print("My total followers: ", len(followers))
-        sleep(2)
+        sleep(2)        
+        return
     
         # Get the people that I follow
         following = scrape_followers(username, browser, 1)
