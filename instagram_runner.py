@@ -12,15 +12,15 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from time import sleep
 
-# Initialize a chrome browser using the driver 87 chromium
+# Initialize a chrome browser using the latest chromium driver
+# For now the chromedriver.exe must be in the same dir as the python script
 def initialize_browser():
      browser = webdriver.Chrome(executable_path=".\\chromedriver.exe")
      browser.implicitly_wait(5)     
      return browser
 
-# Login to the website using the provided credentials
-def login(username, password, browser):
-    print("\tClicking on login link")    
+# Login to the website using the provided credentials username and password
+def login(username, password, browser): 
     browser.get("https://www.instagram.com/accounts/login/")
     sleep(3)
 
@@ -39,6 +39,8 @@ def login(username, password, browser):
         EC.presence_of_element_located((By.LINK_TEXT, "See All")))
  
 # Scrape the followers/people that follow you for a given account
+# 2 Modes -> 1 To get the people that follow you
+#         -> 2 To get the people you follow
 def scrape_followers(account, browser, mode):
     #Load the page for the account
     print("Loading the account {0}".format(account))
@@ -116,44 +118,46 @@ def unfollow_person(account, browser):
 def main():
     try:
         print("Starting instagram bot")
-        print("Reading Command Line Arguments")
         
         username = ''
         password = ''
         mode = 0
         browser = None
+        instagram_url = "https://www.instagram.com/"
         
+        # Basic Usage, provide the username, password, and mode to run (0,1)
         if len(sys.argv) != 4:
-            print("Invalid Usage. - Please try again, usage: Username, Password, Mode (0 - Get Bad Followers / 1 - Get and unfollow bad followers)")
+            print("Invalid Usage. - Please try again, usage: Username, Password, \
+            Mode (0 - Get Bad Followers / 1 - Get and unfollow bad followers)")
             return
         
         username = sys.argv[1]
         password = sys.argv[2]
         mode = int(sys.argv[3])
 
-        print("Logging into the account - ", username, "password - ", password, "with mode - ", mode)    
+        print("Logging in into the account {0} | password {1} | running with mode {2}"\
+        .format(username, password, mode) )
         
-        # Chrome browser
-        browser = initialize_browser()        
-        instagram_url = "https://www.instagram.com/"
+        # Initialize the chrome browser object
+        browser = initialize_browser()
 
         # Login to insta
-        print("Logging in")
         login(username, password, browser)
         sleep(1)
-        print("Logged in")
+        print("Logged in into the account {0} | password {1}"\
+        .format(username, password) )
 
         # Get a list of that follow me
         followers = scrape_followers(username, browser, 2)     
         print("My total followers: ", len(followers))
         sleep(2)
     
-        return
         # Get the people that I follow
         following = scrape_followers(username, browser, 1)
         print("Number of people following me", len(following))
         sleep(1)
 
+        return
         # Set A is my followers, set B is the people I follow
         # A bad follower is defined by me as someone that I follow but does not follow me back
         # We can easily find this with Set Theory. Set Difference B - A
