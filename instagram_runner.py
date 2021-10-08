@@ -69,30 +69,29 @@ def scrape_followers(account, browser, mode):
     print("\t{0}".format(totalCount))
     
     # Use the  CSS nth-child behavior to get n children
-    follower_css = "ul div li:nth-child({}) a.notranslate" 
+    followerCss = "ul div li:nth-child({}) a.notranslate" 
+    lastChildCss = "ul div li:nth-last-child(1) a.notranslate" 
     peopleSet = set()
-    
+
     # Create and return a set of all the following/followers
-    # Insta loads the followers by groups
-    # force the modal to scroll down to the next group
-    stepSize = 6
-    for instaGroup in itertools.count(start=1, step=stepSize):
-        for followerIndex in range(instaGroup, instaGroup + stepSize):
-            # Avoid index out of bounds
-            if followerIndex > totalCount:
-                return peopleSet
-                
-            followerName = waiter.find_element(browser, follower_css.format(followerIndex)).text
-            peopleSet.add(followerName)
-            print("follower {0} is - {1}".format(followerIndex, followerName))
-            
-        # We should scroll past the last follower we found
-        lastFollower = waiter.find_element(browser, follower_css.format(instaGroup+stepSize-1))
-        #print("last follower is - {0}".format(lastFollower.text))
-        browser.execute_script("arguments[0].scrollIntoView();", lastFollower)
-        sleep(1)
-    
-    # If there is no one in the set. Big F if no one follows you my dude
+    # We need to scroll the modal in order for the next followers to load    
+    for followerIndex in range(1, totalCount):
+        follower = waiter.find_element(browser, followerCss.format(followerIndex))
+        followerName = follower.text
+        peopleSet.add(followerName)
+        print("follower {0} is - {1}".format(followerIndex, followerName))
+        
+        lastFollower = waiter.find_element(browser, lastChildCss)
+        print("last follower {0} is - {1}".format(followerIndex, lastFollower.text))
+        
+        # Sometimes instagram lies, and the follower count is wrong
+        # If the last loaded child is the last child, then exit
+        if followerIndex == 573:
+            print("Last follower is {0}".format(followerName))
+            return peopleSet
+
+        browser.execute_script("arguments[0].scrollIntoView();", follower)
+        
     return peopleSet
     
 # Function to unfollow the given person
