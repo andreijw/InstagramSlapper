@@ -65,34 +65,29 @@ def scrape_followers(account, browser, mode):
     browser.find_element_by_partial_link_text(link).click()    
     # Wait for the modal to load    
     waiter.find_element(browser, "//div[@role='dialog']", by=XPATH)    
-    totalCount = int(browser.find_element_by_xpath(listXPath).text)
+    totalCount = int((browser.find_element_by_xpath(listXPath).text).replace(',',''))
     print("\t{0}".format(totalCount))
     
-    # Use the  CSS nth-child behavior to get n children
+    # Use CSS to get the nth children
     followerCss = "ul div li:nth-child({}) a.notranslate" 
-    lastChildCss = "ul div li:nth-last-child(1) a.notranslate" 
     peopleSet = set()
 
     # Create and return a set of all the following/followers
-    # We need to scroll the modal in order for the next followers to load    
-    for followerIndex in range(1, totalCount):
-        follower = waiter.find_element(browser, followerCss.format(followerIndex))
-        followerName = follower.text
-        peopleSet.add(followerName)
-        print("follower {0} is - {1}".format(followerIndex, followerName))
-        
-        lastFollower = waiter.find_element(browser, lastChildCss)
-        print("last follower {0} is - {1}".format(followerIndex, lastFollower.text))
-        
-        # Sometimes instagram lies, and the follower count is wrong
-        # If the last loaded child is the last child, then exit
-        if followerIndex == 573:
-            print("Last follower is {0}".format(followerName))
-            return peopleSet
+    # We need to scroll the modal in order for the next few followers to load
+    try:
+        for followerIndex in range(1, totalCount):
+            follower = waiter.find_element(browser, followerCss.format(followerIndex))
+            followerName = follower.text
+            peopleSet.add(followerName)
+            print("follower {0} is - {1}".format(followerIndex, followerName))
 
-        browser.execute_script("arguments[0].scrollIntoView();", follower)
-        
-    return peopleSet
+            browser.execute_script("arguments[0].scrollIntoView();", follower)
+
+    except Exception as ex:
+        # Sometimes instagram lies, and the follower count is wrong
+        print("Insta lied to me {0}".format(type(ex).__name__))
+    finally:
+        return peopleSet
     
 # Function to unfollow the given person
 def unfollow_person(account, browser):
@@ -106,17 +101,29 @@ def unfollow_person(account, browser):
     except Exception as e:
         print("Error unfollowing - {0} | {1}".format(account, e))
         return
+
+# Write the input peopleSet into the output text file
+def write_output_to_file(peopleSet, outputFile):
+    with open(outputFile, 'w') as f:
+        for follower in peopleSet:
+            f.write("%s\n" % follower)
     
-# Runner function
+    print("Wrote the content to the file - {0}".format(outputFile))
+    sleep(1)
+    
+# Runner function for the insta-thot-remover
 def main():
     try:
         print("Starting instagram bot")
         
         username = ''
         password = ''
-        mode = 0
+        mode = 1
         browser = None
         instagram_url = "https://www.instagram.com/"
+        followersFile = "Followers.txt"
+        followingFile = "Following.txt"
+        badFollowersFile = "BadFollowers.txt"
         
         # Basic Usage, provide the username, password, and mode to run (0,1)
         if len(sys.argv) != 4:
@@ -127,6 +134,7 @@ def main():
         username = sys.argv[1]
         password = sys.argv[2]
         mode = int(sys.argv[3])
+        mode = mode if mode > 1 else 1
 
         print("Logging in into the account {0} | password {1} | running with mode {2}"\
         .format(username, password, mode) )
@@ -134,22 +142,28 @@ def main():
         # Initialize the chrome browser object
         browser = initialize_browser()
 
-        # Login to insta
+        # Login to insta with the input username and password
         login(username, password, browser)
         sleep(1)
-        print("Logged in into the account {0} | password {1}"\
-        .format(username, password) )
+        print("Logged in into the account {0} | password {1} | mode {2}"\
+        .format(username, password, mode))
 
-        # Get a list of people that follow me. Mode 2 gets the people that follow me
-        followers = scrape_followers(username, browser, 2)     
-        print("My total followers: ", len(followers))
-        sleep(2)        
-        return
-    
-        # Get the people that I follow
-        following = scrape_followers(username, browser, 1)
-        print("Number of people following me", len(following))
-        sleep(1)
+        # Use bitwise operator on the mode to perform the following functionality
+        # &1 -> Get Followers of the account
+        # &2 -> Get People the account follows
+        # &3 -> Get Bad Followers (People that don't follow you back) + &1 & &2 obv
+ 
+        if mode&1:
+            # Use mode 2 in the scrape func to get a list of people that follow an account
+            followers = scrape_followers(username, browser, 2)     
+            print("My total followers: ", len(followers))
+            write_output_to_file(followers, followersFile)  
+        
+        if mode&2:
+            # Get the people that the account follows
+            following = scrape_followers(username, browser, 1)
+            print("Number of people following me", len(following))
+            write_output_to_file(following, followingFile) 
 
         return
         # Set A is my followers, set B is the people I follow
@@ -161,15 +175,8 @@ def main():
         print("Number of people not following me", len(bad_followers))    
         
         # Print the list to an output file so that I can perform a holistic review 
-        # For isntance if they are hot af, I might keep them :)
-        outputFile = "BadFollowers.txt"
-        
-        with open(outputFile, 'w') as f:
-            for follower in bad_followers:
-                f.write("%s\n" % follower)
-        
-        print("Wrote the content to the file - {0}".format(outputFile))
-        sleep(1)
+        # For isntance if they are hot af, I might keep them :)      
+
         
         # Read in the clean list of people not to unfollow
         cleanList = set(line.strip() for line in open("WhiteList.txt"))
