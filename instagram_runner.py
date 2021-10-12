@@ -175,7 +175,7 @@ def main():
             # which will be all the elements in Set B (I follow) and are not in Set A (follow me)
             print("Getting people that don't follow me back")
             badFollowers = following - followers
-            print("Number of people not following me", len(bad_followers))
+            print("Number of people not following me", len(badFollowers))
             write_output_to_file(badFollowers, badFollowersFile)
         
         return

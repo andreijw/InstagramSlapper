@@ -130,3 +130,8 @@ dmypy.json
 
 # Chromium Driver
 chromedriver*
+
+# Custom txt files
+Following.txt
+Followers.txt
+Refollow.txt
