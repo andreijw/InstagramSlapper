@@ -124,6 +124,9 @@ def main():
         followersFile = "Followers.txt"
         followingFile = "Following.txt"
         badFollowersFile = "BadFollowers.txt"
+        follwing = set()
+        followers = set()
+        badFollowers = set()
         
         # Basic Usage, provide the username, password, and mode to run (0,1)
         if len(sys.argv) != 4:
@@ -165,19 +168,17 @@ def main():
             print("Number of people following me", len(following))
             write_output_to_file(following, followingFile) 
 
+        if mode&3:
+            # Set A is my followers, set B is the people I follow
+            # A bad follower is defined by me as someone that I follow but does not follow me back
+            # We can easily find this with Set Theory. Set Difference B - A
+            # which will be all the elements in Set B (I follow) and are not in Set A (follow me)
+            print("Getting people that don't follow me back")
+            badFollowers = following - followers
+            print("Number of people not following me", len(bad_followers))
+            write_output_to_file(badFollowers, badFollowersFile)
+        
         return
-        # Set A is my followers, set B is the people I follow
-        # A bad follower is defined by me as someone that I follow but does not follow me back
-        # We can easily find this with Set Theory. Set Difference B - A
-        # which will be all the elements in Set B (I follow) and are not in Set A (follow me)
-        print("Getting people that don't follow me back")
-        bad_followers = following - followers
-        print("Number of people not following me", len(bad_followers))    
-        
-        # Print the list to an output file so that I can perform a holistic review 
-        # For isntance if they are hot af, I might keep them :)      
-
-        
         # Read in the clean list of people not to unfollow
         cleanList = set(line.strip() for line in open("WhiteList.txt"))
         
