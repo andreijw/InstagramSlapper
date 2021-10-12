@@ -124,9 +124,9 @@ def main():
         followersFile = "Followers.txt"
         followingFile = "Following.txt"
         badFollowersFile = "BadFollowers.txt"
-        follwing = set()
-        followers = set()
-        badFollowers = set()
+        cleanListFile = "CleanList.txt"
+        follwing, followers, badFollowers, removeList = set(), set(), set(), set()
+        cleanList = set()
         
         # Basic Usage, provide the username, password, and mode to run (0,1)
         if len(sys.argv) != 4:
@@ -155,6 +155,7 @@ def main():
         # &1 -> Get Followers of the account
         # &2 -> Get People the account follows
         # &3 -> Get Bad Followers (People that don't follow you back) + &1 & &2 obv
+        # &4 -> Read in from local files Followers.txt, Following.txt and BadFollowers.txt
  
         if mode&1:
             # Use mode 2 in the scrape func to get a list of people that follow an account
@@ -178,14 +179,22 @@ def main():
             print("Number of people not following me", len(badFollowers))
             write_output_to_file(badFollowers, badFollowersFile)
         
-        return
         # Read in the clean list of people not to unfollow
-        cleanList = set(line.strip() for line in open("WhiteList.txt"))
+        cleanList = set(line.strip() for line in open(cleanListFile))
         
-        removeList = bad_followers - cleanList
-        print(len(removeList))
-        print("Filtered out the clean list")
+        if mode&4:
+            print("Mode set to 4, reading in from the files")
+            followers = set(line.strip() for line in open(followersFile))
+            print("Length of followers set - {0}".format(len(followers)))
+            following = set(line.strip() for line in open(followingFile))
+            print("Length of following set - {0}".format(len(following)))
+            badFollowers = set(line.strip() for line in open(badFollowersFile))
+            print("Length of badFollowers set - {0}".format(len(badFollowers)))
+                
+        removeList = badFollowers - cleanList
+        print("Filtered out the clean list followers about to remove {0}".format(len(removeList)))
         
+        return
         for person in removeList:
             unfollow_person(person, browser)
             sleep(2)
