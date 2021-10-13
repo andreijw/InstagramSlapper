@@ -161,13 +161,21 @@ def main():
             # Use mode 2 in the scrape func to get a list of people that follow an account
             followers = scrape_followers(username, browser, 2)     
             print("My total followers: ", len(followers))
-            write_output_to_file(followers, followersFile)  
+            write_output_to_file(followers, followersFile)
+            
+            if (mode ^ 1) == 0:
+                print("Mode is set to 1. Only obtaining the followers set")
+                return
         
         if mode&2:
             # Get the people that the account follows
             following = scrape_followers(username, browser, 1)
             print("Number of people following me", len(following))
-            write_output_to_file(following, followingFile) 
+            write_output_to_file(following, followingFile)
+            
+            if (mode ^ 2) == 0:
+                print("Mode is set to 2. Only obtaining the following set")
+                return
 
         if mode&3:
             # Set A is my followers, set B is the people I follow
@@ -178,6 +186,10 @@ def main():
             badFollowers = following - followers
             print("Number of people not following me", len(badFollowers))
             write_output_to_file(badFollowers, badFollowersFile)
+            
+            if (mode ^ 3) == 0:
+                print("Mode is set to 3. Only obtaining the badFollowers set")
+                return
         
         # Read in the clean list of people not to unfollow
         cleanList = set(line.strip() for line in open(cleanListFile))
@@ -194,10 +206,10 @@ def main():
         removeList = badFollowers - cleanList
         print("Filtered out the clean list followers about to remove {0}".format(len(removeList)))
         
-        return
+        # I think insta will action lock the account if we remove more than 600 people
         for person in removeList:
             unfollow_person(person, browser)
-            sleep(2)
+            sleep(1)
 
     except Exception as e:
         print("An error ocurred while running the bot, exiting - ")
