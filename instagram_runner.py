@@ -96,7 +96,9 @@ def unfollow_person(account, browser):
     
     print("\tUnfollowing {0}".format(account))
     try:
-        browser.find_elements_by_xpath("//button[contains(@class, '_5f5mN    -fzfL     _6VtSN     yZn4P   ')]")[0].click()
+        #browser.find_elements_by_xpath("//button[contains(@class, '_5f5mN    -fzfL     _6VtSN     yZn4P   ')]")[0].click()
+        browser.find_elements_by_xpath("//*[contains(@aria-label, 'Following')]")[0].click()
+        sleep(0.5)
         browser.find_elements_by_xpath("//button[contains(text(), 'Unfollow')]")[0].click()
     except Exception as e:
         print("Error unfollowing - {0} | {1}".format(account, e))
