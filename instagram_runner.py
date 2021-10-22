@@ -96,9 +96,7 @@ def unfollow_person(account, browser):
     
     print("\tUnfollowing {0}".format(account))
     try:
-        #browser.find_elements_by_xpath("//button[contains(@class, '_5f5mN    -fzfL     _6VtSN     yZn4P   ')]")[0].click()
-        browser.find_elements_by_xpath("//*[contains(@aria-label, 'Following')]")[0].click()
-        sleep(0.5)
+        WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, "//*[contains(@aria-label, 'Following')]"))).click()
         browser.find_elements_by_xpath("//button[contains(text(), 'Unfollow')]")[0].click()
     except Exception as e:
         print("Error unfollowing - {0} | {1}".format(account, e))
@@ -211,7 +209,7 @@ def main():
         # I think insta will action lock the account if we remove more than 600 people
         for person in removeList:
             unfollow_person(person, browser)
-            sleep(1)
+            sleep(3)
 
     except Exception as e:
         print("An error ocurred while running the bot, exiting - ")
