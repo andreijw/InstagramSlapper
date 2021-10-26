@@ -4,6 +4,8 @@ And remove anyone that does not follow me back
 '''
 import itertools
 import sys
+import requests
+import json
 
 from explicit import waiter, XPATH
 from selenium import webdriver
@@ -11,6 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from time import sleep
+from bs4 import BeautifulSoup as bs
 
 # Initialize a chrome browser using the latest chromium driver
 # For now the chromedriver.exe must be in the same dir as the python script
@@ -111,6 +114,25 @@ def write_output_to_file(peopleSet, outputFile):
     print("Wrote the content to the file - {0}".format(outputFile))
     sleep(1)
     
+    
+def get_images(browser, account):
+    print("Getting images from the account {0}".format(account))
+    https_response = requests.get("https://www.instagram.com/{0}/".format(account))
+    
+    if https_response.ok:
+        html_content = https_response.text
+        parsed_html = bs(html_content, features="html.parser")
+        parsed_html = parsed_html.text
+        
+        print(parsed_html)
+        print(parsed_html.find("url"))
+    
+    return
+
+# Using tesnorlow, opencv-python, keras, imageAI
+def get_thot_rating(browser, account):
+    return
+    
 # Runner function for the insta-thot-remover
 def main():
     try:
@@ -138,18 +160,19 @@ def main():
         password = sys.argv[2]
         mode = int(sys.argv[3])
         mode = mode if mode > 1 else 1
-
-        print("Logging in into the account {0} | password {1} | running with mode {2}"\
-        .format(username, password, mode) )
         
-        # Initialize the chrome browser object
-        browser = initialize_browser()
-
-        # Login to insta with the input username and password
-        login(username, password, browser)
-        sleep(1)
-        print("Logged in into the account {0} | password {1} | mode {2}"\
-        .format(username, password, mode))
+        if mode != 8:
+            print("Logging in into the account {0} | password {1} | running with mode {2}"\
+            .format(username, password, mode) )          
+        
+            # Initialize the chrome browser object
+            browser = initialize_browser()
+            
+            # Login to insta with the input username and password
+            login(username, password, browser)
+            sleep(1)
+            print("Logged in into the account {0} | password {1} | mode {2}"\
+            .format(username, password, mode))
 
         # Use bitwise operator on the mode to perform the following functionality
         # &1 -> Get Followers of the account
@@ -210,6 +233,19 @@ def main():
         for person in removeList:
             unfollow_person(person, browser)
             sleep(3)
+        
+        if (mode ^ 4) == 0:
+            print("Mode was set to 4. Exiting after removing the bad followers")
+            return
+            
+        if mode&8:
+            # Remove thots
+            # For now we will only look at 1 profile
+            # lolaloliitaaa
+            # Look at the first 5 images and compute the thot score
+            
+            inspectedAccount = "lolaloliitaaa"
+            get_images(browser, inspectedAccount)
 
     except Exception as e:
         print("An error ocurred while running the bot, exiting - ")
