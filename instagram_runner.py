@@ -6,6 +6,7 @@ import itertools
 import sys
 import requests
 import json
+import os
 
 from explicit import waiter, XPATH
 from selenium import webdriver
@@ -86,9 +87,9 @@ def scrape_followers(account, browser, mode):
 
             browser.execute_script("arguments[0].scrollIntoView();", follower)
 
-    except Exception as ex:
+    except Exception as e:
         # Sometimes instagram lies, and the follower count is wrong
-        print("Insta lied to me {0}".format(type(ex).__name__))
+        print("Insta lied to me {0}".format(type(e).__name__))
     finally:
         return peopleSet
     
@@ -113,25 +114,46 @@ def write_output_to_file(peopleSet, outputFile):
     
     print("Wrote the content to the file - {0}".format(outputFile))
     sleep(1)
-    
-    
+
+# Function to download an image from the source path    
+def download_image(urlPath, destPath):
+    img_content = requests.get(urlPath).content
+    with open(destPath, 'wb') as handler:
+        handler.write(img_content)
+
+# Function to get the profile pic and the first 4 human posts
 def get_images(browser, account):
     print("Getting images from the account {0}".format(account))
-    https_response = requests.get("https://www.instagram.com/{0}/".format(account))
-    
-    if https_response.ok:
-        html_content = https_response.text
-        parsed_html = bs(html_content, features="html.parser")
-        parsed_html = parsed_html.text
+    try:
+        # Create images dir
+        images_dir_path = "./images"
+        os.mkdir(images_dir_path)
         
-        print(parsed_html)
-        print(parsed_html.find("url"))
+        #https_response = requests.get("https://www.instagram.com/{0}/".format(account))
+        browser.get("https://www.instagram.com/{0}/".format(account))
+        source_url = browser.find_element_by_xpath("//img[contains(@class,'_6q-tv')]").get_attribute("src")
+
+        download_image(source_url, "{0}/profile.png".format(images_dir_path))
+
+    except Exception as e:
+        print("Error while getting the account images {0}".format(e))
     
     return
 
 # Using tesnorlow, opencv-python, keras, imageAI
 def get_thot_rating(browser, account):
-    return
+    # Calculate a weighted average thot_rating score of the profile pic + 4 images
+    get_images(browser, account)
+    
+    # Get follower / following ratio
+    
+    # Get post frequency in last month
+    
+    # Get tags thot_rating
+    
+    # Get captions thot_rating
+    
+    return 0
     
 # Runner function for the insta-thot-remover
 def main():
@@ -161,13 +183,13 @@ def main():
         mode = int(sys.argv[3])
         mode = mode if mode > 1 else 1
         
+        # Initialize the chrome browser object
+        browser = initialize_browser()
+        
         if mode != 8:
             print("Logging in into the account {0} | password {1} | running with mode {2}"\
-            .format(username, password, mode) )          
-        
-            # Initialize the chrome browser object
-            browser = initialize_browser()
-            
+            .format(username, password, mode))
+
             # Login to insta with the input username and password
             login(username, password, browser)
             sleep(1)
@@ -245,7 +267,8 @@ def main():
             # Look at the first 5 images and compute the thot score
             
             inspectedAccount = "lolaloliitaaa"
-            get_images(browser, inspectedAccount)
+            thot_rating = get_thot_rating(browser, inspectedAccount)
+            print("thot rating for the account - {0} is {1}".format(inspectedAccount, thot_rating))
 
     except Exception as e:
         print("An error ocurred while running the bot, exiting - ")
