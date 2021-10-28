@@ -7,6 +7,7 @@ import sys
 import requests
 import json
 import os
+import shutil
 
 from explicit import waiter, XPATH
 from selenium import webdriver
@@ -35,8 +36,8 @@ def login(username, password, browser):
     submit.submit()
     
     # Click both not now buttons
-    browser.find_elements_by_xpath("//button[contains(text(), 'Not Now')]")[0].click()    
-    browser.find_elements_by_xpath("//button[contains(text(), 'Not Now')]")[0].click()
+    browser.find_element_by_xpath("//button[contains(text(), 'Not Now')]")[0].click()    
+    browser.find_element_by_xpath("//button[contains(text(), 'Not Now')]")[0].click()
     
     # Wait for the user dashboard page to load
     WebDriverWait(browser, 15).until(
@@ -101,7 +102,7 @@ def unfollow_person(account, browser):
     print("\tUnfollowing {0}".format(account))
     try:
         WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, "//*[contains(@aria-label, 'Following')]"))).click()
-        browser.find_elements_by_xpath("//button[contains(text(), 'Unfollow')]")[0].click()
+        browser.find_element_by_xpath("//button[contains(text(), 'Unfollow')]")[0].click()
     except Exception as e:
         print("Error unfollowing - {0} | {1}".format(account, e))
         return
@@ -123,17 +124,27 @@ def download_image(urlPath, destPath):
 
 # Function to get the profile pic and the first 4 human posts
 def get_images(browser, account):
+    account = "andrei_j_w"
     print("Getting images from the account {0}".format(account))
     try:
         # Create images dir
         images_dir_path = "./images"
+        if os.path.isdir(images_dir_path):
+            shutil.rmtree(images_dir_path)
+
         os.mkdir(images_dir_path)
-        
-        #https_response = requests.get("https://www.instagram.com/{0}/".format(account))
+
+        # Get the profile pic
         browser.get("https://www.instagram.com/{0}/".format(account))
         source_url = browser.find_element_by_xpath("//img[contains(@class,'_6q-tv')]").get_attribute("src")
-
         download_image(source_url, "{0}/profile.png".format(images_dir_path))
+        
+        #images = browser.find_elements_by_xpath("//img[contains(@class,'FFVAD')]")
+        #print("images found", len(images))
+        # Get the first 4 post images
+        #for i in range(4):
+        #    source_url = browser.find_element_by_xpath("//img[contains(@class,'FFVAD')]").get_attribute("src")
+        #    download_image(source_url, "{0}/image{1}.png".format(images_dir_path, i))
 
     except Exception as e:
         print("Error while getting the account images {0}".format(e))
