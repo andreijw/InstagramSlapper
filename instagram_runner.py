@@ -36,12 +36,22 @@ def login(username, password, browser):
     submit.submit()
     
     # Click both not now buttons
-    browser.find_element_by_xpath("//button[contains(text(), 'Not Now')]")[0].click()    
-    browser.find_element_by_xpath("//button[contains(text(), 'Not Now')]")[0].click()
+    browser.find_elements_by_xpath("//button[contains(text(), 'Not Now')]")[0].click()    
+    browser.find_elements_by_xpath("//button[contains(text(), 'Not Now')]")[0].click()
     
     # Wait for the user dashboard page to load
     WebDriverWait(browser, 15).until(
         EC.presence_of_element_located((By.LINK_TEXT, "See All")))
+        
+# Function to either get the number of followers / following for an account        
+def get_count_number(account, browser, link, listXPath):
+    # Click the Following / Followers link
+    browser.find_element_by_partial_link_text(link).click()    
+    # Wait for the modal to load    
+    waiter.find_element(browser, "//div[@role='dialog']", by=XPATH)    
+    totalCount = int((browser.find_element_by_xpath(listXPath).text).replace(',',''))
+    
+    return totalCount
  
 # Scrape the followers/people that follow you for a given account
 # 2 Modes -> 1 To get the people that follow you
@@ -66,11 +76,7 @@ def scrape_followers(account, browser, mode):
         listXPath= "//li[2]/a/span"
         print("\tFollowers found ->")
     
-    # Click the Following / Followers link
-    browser.find_element_by_partial_link_text(link).click()    
-    # Wait for the modal to load    
-    waiter.find_element(browser, "//div[@role='dialog']", by=XPATH)    
-    totalCount = int((browser.find_element_by_xpath(listXPath).text).replace(',',''))
+    totalCount = get_count_number(account, browser, link, listXPath)
     print("\t{0}".format(totalCount))
     
     # Use CSS to get the nth children
@@ -102,7 +108,7 @@ def unfollow_person(account, browser):
     print("\tUnfollowing {0}".format(account))
     try:
         WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, "//*[contains(@aria-label, 'Following')]"))).click()
-        browser.find_element_by_xpath("//button[contains(text(), 'Unfollow')]")[0].click()
+        browser.find_element_by_xpath("//button[contains(text(), 'Unfollow')]").click()
     except Exception as e:
         print("Error unfollowing - {0} | {1}".format(account, e))
         return
@@ -139,12 +145,17 @@ def get_images(browser, account):
         source_url = browser.find_element_by_xpath("//img[contains(@class,'_6q-tv')]").get_attribute("src")
         download_image(source_url, "{0}/profile.png".format(images_dir_path))
         
-        #images = browser.find_elements_by_xpath("//img[contains(@class,'FFVAD')]")
-        #print("images found", len(images))
-        # Get the first 4 post images
-        #for i in range(4):
-        #    source_url = browser.find_element_by_xpath("//img[contains(@class,'FFVAD')]").get_attribute("src")
-        #    download_image(source_url, "{0}/image{1}.png".format(images_dir_path, i))
+        images = browser.find_elements_by_xpath("//img[contains(@class,'FFVAD')]")
+        stop_index = 4
+        # Get the first images available up to the stop_index
+        for count, image in enumerate(images):
+            source_url = image.get_attribute("src")
+            download_image(source_url, "{0}/image{1}.png".format(images_dir_path, count))
+            
+            if count >= stop_index:
+                break
+        
+        print("Downloaded the profile pic and first 4 image potsts")
 
     except Exception as e:
         print("Error while getting the account images {0}".format(e))
@@ -157,6 +168,9 @@ def get_thot_rating(browser, account):
     get_images(browser, account)
     
     # Get follower / following ratio
+    followerCount = get_count_number(account, browser, "followers", "//li[2]/a/span" )
+    followingCount = get_count_number(account, browser, "following", "//li[3]/a/span")
+    followerRatio = followerCount / followingCount
     
     # Get post frequency in last month
     
@@ -164,7 +178,10 @@ def get_thot_rating(browser, account):
     
     # Get captions thot_rating
     
-    return 0
+    # Compute thot rating. Will use this as features into a ml model
+    thot_rating = followerRatio
+    
+    return thot_rating
     
 # Runner function for the insta-thot-remover
 def main():
