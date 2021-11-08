@@ -35,6 +35,10 @@ def login(username, password, browser):
     submit = browser.find_element_by_tag_name('form')
     submit.submit()
     
+    # Sleep needed to put in the 2 factor code
+    print("Put in 2 fact authentication code if needed")
+    sleep(8)
+    
     # Click both not now buttons
     browser.find_elements_by_xpath("//button[contains(text(), 'Not Now')]")[0].click()    
     browser.find_elements_by_xpath("//button[contains(text(), 'Not Now')]")[0].click()
@@ -132,6 +136,10 @@ def download_image(urlPath, destPath):
 def get_images(browser, account):
     account = "andrei_j_w"
     print("Getting images from the account {0}".format(account))
+    tags = set()
+    captions = set()
+    post_frequency = 0
+    
     try:
         # Create images dir
         images_dir_path = "./images"
@@ -156,27 +164,24 @@ def get_images(browser, account):
                 break
         
         print("Downloaded the profile pic and first 4 image potsts")
+        
+        return (tags, captions, post_frequency)
 
     except Exception as e:
         print("Error while getting the account images {0}".format(e))
     
-    return
+    return (set(), set(), 0)
 
 # Using tesnorlow, opencv-python, keras, imageAI
 def get_thot_rating(browser, account):
     # Calculate a weighted average thot_rating score of the profile pic + 4 images
-    get_images(browser, account)
+    # Get post frequency in last month, tags thot_ratinga and captions thot_rating
+    tags, captions, post_frequency = get_images(browser, account)
     
     # Get follower / following ratio
     followerCount = get_count_number(account, browser, "followers", "//li[2]/a/span" )
     followingCount = get_count_number(account, browser, "following", "//li[3]/a/span")
     followerRatio = followerCount / followingCount
-    
-    # Get post frequency in last month
-    
-    # Get tags thot_rating
-    
-    # Get captions thot_rating
     
     # Compute thot rating. Will use this as features into a ml model
     thot_rating = followerRatio
@@ -243,7 +248,7 @@ def main():
         if mode&2:
             # Get the people that the account follows
             following = scrape_followers(username, browser, 1)
-            print("Number of people following me", len(following))
+            print("Number of people I follow", len(following))
             write_output_to_file(following, followingFile)
             
             if (mode ^ 2) == 0:
@@ -282,7 +287,7 @@ def main():
         # I think insta will action lock the account if we remove more than 600 people
         for person in removeList:
             unfollow_person(person, browser)
-            sleep(3)
+            sleep(10)
         
         if (mode ^ 4) == 0:
             print("Mode was set to 4. Exiting after removing the bad followers")
