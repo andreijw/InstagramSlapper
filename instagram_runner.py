@@ -2,25 +2,32 @@
 Code to open up my instagram, pull the list of all my followers, and those whom I followers
 And remove anyone that does not follow me back
 '''
+
+# Standard Imports
 import itertools
-import sys
-import requests
 import json
 import os
+import requests
 import shutil
+import sys
 
+from bs4 import BeautifulSoup as bs
 from explicit import waiter, XPATH
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from time import sleep
-from bs4 import BeautifulSoup as bs
+
+# Custom imports
+from Common import Constants
+from Common import StringResources
+from Library import Validation
 
 # Initialize a chrome browser using the latest chromium driver
 # For now the chromedriver.exe must be in the same dir as the python script
 def initialize_browser():
-     browser = webdriver.Chrome(executable_path=".\\chromedriver.exe")
+     browser = webdriver.Chrome(executable_path=Constants.CHORMIUM_DRIVER_PATH)
      browser.implicitly_wait(5)     
      return browser
 
@@ -191,44 +198,34 @@ def get_thot_rating(browser, account):
 # Runner function for the insta-thot-remover
 def main():
     try:
-        print("Starting instagram bot")
+        print(StringResources.INTRO_TEXT)
         
         username = ''
         password = ''
         mode = 1
         browser = None
-        instagram_url = "https://www.instagram.com/"
-        followersFile = "Followers.txt"
-        followingFile = "Following.txt"
-        badFollowersFile = "BadFollowers.txt"
-        cleanListFile = "CleanList.txt"
-        follwing, followers, badFollowers, removeList = set(), set(), set(), set()
-        cleanList = set()
-        
+        follwing, followers, badFollowers, removeList, cleanList = set(), set(), set(), set(), set()
+
         # Basic Usage, provide the username, password, and mode to run (0,1)
-        if len(sys.argv) != 4:
-            print("Invalid Usage. - Please try again, usage: Username, Password, \
-            Mode (0 - Get Bad Followers / 1 - Get and unfollow bad followers)")
+        if not Validation.validate_login(sys.argv):
+            print(StringResources.INVALID_USAGE_MODE)
             return
         
         username = sys.argv[1]
         password = sys.argv[2]
         mode = int(sys.argv[3])
-        mode = mode if mode > 1 else 1
+        print(StringResources.VALID_INPUT_DATA)
+        return
         
         # Initialize the chrome browser object
-        browser = initialize_browser()
+        browser = initialize_browser()       
         
-        if mode != 8:
-            print("Logging in into the account {0} | password {1} | running with mode {2}"\
-            .format(username, password, mode))
-
-            # Login to insta with the input username and password
-            login(username, password, browser)
-            sleep(1)
-            print("Logged in into the account {0} | password {1} | mode {2}"\
-            .format(username, password, mode))
-
+        # Login to insta with the input username and password
+        login(username, password, browser)
+        sleep(1)
+        print("Logged in into the account {0} | password {1} | mode {2}"\
+        .format(username, password, mode))
+        
         # Use bitwise operator on the mode to perform the following functionality
         # &1 -> Get Followers of the account
         # &2 -> Get People the account follows
@@ -238,7 +235,7 @@ def main():
         if mode&1:
             # Use mode 2 in the scrape func to get a list of people that follow an account
             followers = scrape_followers(username, browser, 2)     
-            print("My total followers: ", len(followers))
+            print("The total account followers are: ", len(followers))
             write_output_to_file(followers, followersFile)
             
             if (mode ^ 1) == 0:
@@ -248,7 +245,7 @@ def main():
         if mode&2:
             # Get the people that the account follows
             following = scrape_followers(username, browser, 1)
-            print("Number of people I follow", len(following))
+            print("Number of people the account follows", len(following))
             write_output_to_file(following, followingFile)
             
             if (mode ^ 2) == 0:
@@ -280,7 +277,10 @@ def main():
             print("Length of following set - {0}".format(len(following)))
             badFollowers = set(line.strip() for line in open(badFollowersFile))
             print("Length of badFollowers set - {0}".format(len(badFollowers)))
-                
+        
+        print("Logging in into the account {0} | password {1} | running with mode {2}"\
+        .format(username, password, mode))
+            
         removeList = badFollowers - cleanList
         print("Filtered out the clean list followers about to remove {0}".format(len(removeList)))
         
@@ -304,8 +304,7 @@ def main():
             print("thot rating for the account - {0} is {1}".format(inspectedAccount, thot_rating))
 
     except Exception as e:
-        print("An error ocurred while running the bot, exiting - ")
-        print(e)
+        print("An error ocurred while running the bot | {0}".format(e))
     finally:
         if browser is not None:
             exit(browser)
