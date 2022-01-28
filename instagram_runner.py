@@ -206,8 +206,9 @@ def main():
         browser = None
         follwing, followers, badFollowers, removeList, cleanList = set(), set(), set(), set(), set()
 
+        inputValidator = Validation.Validation()
         # Basic Usage, provide the username, password, and mode to run (0,1)
-        if not Validation.validate_login(sys.argv):
+        if not inputValidator.validate_login(sys.argv):
             print(StringResources.INVALID_USAGE_MODE)
             return
         
