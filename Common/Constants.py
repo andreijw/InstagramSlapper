@@ -18,3 +18,7 @@ BAD_FOLLOWERS_FILE_PATH = "./Output/BadFollowers.txt"
 # Validation
 INSTAGRAM_USERNAME_REGEX = "^[A-Za-z0-9_\.]*$"
 INSTAGRAM_PASSWORD_REGEX = "^[A-Za-z0-9\.\?!,'#]*$"
+
+# Validation tests
+TEST_INVALID_USERNAME = "andrei+jw"
+TEST_VALID_USERNAME = "andreijw_.123"
