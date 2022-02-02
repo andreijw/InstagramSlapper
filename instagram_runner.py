@@ -208,7 +208,7 @@ def main():
 
         inputValidator = Validation.Validation()
         # Basic Usage, provide the username, password, and mode to run (0,1)
-        if not inputValidator.validate_login(sys.argv):
+        if not inputValidator.validate_login(sys.argv[1:]):
             print(StringResources.INVALID_USAGE_MODE)
             return
         

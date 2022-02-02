@@ -10,6 +10,7 @@ import re
 
 # Custom Imports
 from Common import Constants
+from Common import StringResources
 
 class Validation:
     '''
@@ -17,18 +18,18 @@ class Validation:
     :return: True if valid. Else false
     '''
     def validate_login(self, sysArguments):
-        if len(sysArguments) != 4:
+        if len(sysArguments) != 3:
             return False
         
-        if not self.__validate_username(sysArguments[1]):
+        if not self.validate_username(sysArguments[0]):
             print(StringResources.INVALID_USERNAME)
             return False
         
-        if not self.__validate_password(sysArguments[2]):
+        if not self.validate_password(sysArguments[1]):
             print(StringResources.INVALID_PASSWORD)
             return False
             
-        if not self.__validate_mode(sysArguments[3]):
+        if not self.validate_mode(sysArguments[2]):
             print(StringResources.INVALID_MODE)
             return False
         
@@ -38,7 +39,7 @@ class Validation:
     :param Instagram Username - Must only contain alpha numberic period & underscore characters
     :return: True if it's valid. Else false
     '''    
-    def __validate_username(self, username):
+    def validate_username(self, username):
         if not username or len(username) == 0:
             return False
             
@@ -54,7 +55,7 @@ class Validation:
     punctuation marks
     :return: True if the password is valid. Else false
     '''
-    def __validate_password(self, password):
+    def validate_password(self, password):
         if not password or len(password) == 0:
             return False
             
@@ -67,7 +68,7 @@ class Validation:
     '''
     :param Mode - Must be numeric and non negative
     :return: True if the mode is valid. Else false'''
-    def __validate_mode(self, mode):
+    def validate_mode(self, mode):
         if not mode:
             return False
         
