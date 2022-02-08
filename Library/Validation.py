@@ -1,8 +1,7 @@
 """
 Validation.py
 
-This file will server to validate user input, specifically the username, psw and mode
-These are static instance methods. No need to create a class
+This file will serve to validate user input, specifically the username, psw and mode
 """
 
 # Standard Imports
@@ -47,8 +46,7 @@ class Validation:
             return False
             
         match = re.search(Constants.INSTAGRAM_USERNAME_REGEX, username)    
-        return not (match is None)
-        
+        return not (match is None)        
 
     '''
     :param Instagram password - Must be at least 6 characters comprised of letters, numbers and

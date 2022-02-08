@@ -13,23 +13,13 @@ import sys
 
 from bs4 import BeautifulSoup as bs
 from explicit import waiter, XPATH
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
 from time import sleep
 
 # Custom imports
 from Common import Constants
 from Common import StringResources
 from Library import Validation
-
-# Initialize a chrome browser using the latest chromium driver
-# For now the chromedriver.exe must be in the same dir as the python script
-def initialize_browser():
-     browser = webdriver.Chrome(executable_path=Constants.CHORMIUM_DRIVER_PATH)
-     browser.implicitly_wait(5)     
-     return browser
+from Library import Browser
 
 # Login to the website using the provided credentials username and password
 def login(username, password, browser): 
@@ -203,7 +193,7 @@ def main():
         username = ''
         password = ''
         mode = 1
-        browser = None
+        browser = Browser.Browser()
         follwing, followers, badFollowers, removeList, cleanList = set(), set(), set(), set(), set()
 
         inputValidator = Validation.Validation()
@@ -216,11 +206,11 @@ def main():
         password = sys.argv[2]
         mode = int(sys.argv[3])
         print(StringResources.VALID_INPUT_DATA)
+        
+        # Initialize the chrome browser object             
+        browser.initialize_browser()
         return
-        
-        # Initialize the chrome browser object
-        browser = initialize_browser()       
-        
+
         # Login to insta with the input username and password
         login(username, password, browser)
         sleep(1)
@@ -305,15 +295,11 @@ def main():
             print("thot rating for the account - {0} is {1}".format(inspectedAccount, thot_rating))
 
     except Exception as e:
-        print("An error ocurred while running the bot | {0}".format(e))
+        print(StringResources.EXCEPTION_MESSAGE.format(e))
     finally:
-        if browser is not None:
-            exit(browser)
+        if browser.webDriver is not None:
+            print(StringResources.CLOSING_MESSAGE)
+            browser.stop_browser()
 
-# Exit and cleanup 
-def exit(browser):
-    print("Closing the instagram bot")
-    browser.quit()
-    
 if __name__ == "__main__":
     main()

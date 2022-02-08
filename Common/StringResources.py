@@ -13,3 +13,5 @@ INVALID_PASSWORD = "Invalid Password. Only Alpha-numeric and punctuation charact
 are allowed\n"
 INVALID_MODE = "Invalid Mode. This option must be numeric and non negative.\n"
 VALID_INPUT_DATA = "Input Data is valid.\n"
+EXCEPTION_MESSAGE = "An error ocurred while running the bot | {0}\n"
+CLOSING_MESSAGE = "Closing the instagram bot"
