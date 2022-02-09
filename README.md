@@ -16,7 +16,7 @@ https://chromedriver.chromium.org/downloads
 	*(16) - Add thots to your account
 	
 
-Pip freeze Output:
+Pip freeze Output:  
 absl-py==0.15.0
 astunparse==1.6.3
 beautifulsoup4==4.10.0
