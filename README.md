@@ -5,9 +5,9 @@ How to run -
 
 1 - You need pyton3 installed  
 2 - Must be using Chromiun for the driver to work. You will need to install the latest Chrome updates and the latest chromium driver
-https://chromedriver.chromium.org/downloads
-3 - Input the username, password and mode to run in  
-5 - The modes to run are as follow - 
+https://chromedriver.chromium.org/downloads  
+3 - Input the username, password and mode to run in    
+4 - The modes to run are as follow - 
 	*(1) - Get all the followers of the input account
 	*(2) - Get all the people that the input account follows
 	*(3) - Computes 1 & 2 - And the calculate the BadFollowers of people that you follow and don't follow you back
