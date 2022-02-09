@@ -14,7 +14,6 @@ class Browser:
 
     def __init__(self):
         self.webDriver = None
-        self.webDriver = None
         
     ''' 
     Initialize a chrome browser using the latest chromium driver
@@ -30,3 +29,4 @@ class Browser:
     def stop_browser(self):
         if self.webDriver is not None:
             self.webDriver.quit()
+            self.webDriver = None

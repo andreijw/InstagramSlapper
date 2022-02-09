@@ -9,6 +9,7 @@ from parameterized import parameterized, parameterized_class
 from Library import Browser
 
 import unittest
+import time
 
 class TestValidation(unittest.TestCase):
     @classmethod
@@ -16,13 +17,17 @@ class TestValidation(unittest.TestCase):
         cls.browser = Browser.Browser()
 
     def test_initialize_browser(self):
-         assert_equal(self.browser.webDriver is None, True)         
-         self.browser.initialize_browser()         
-         assert_equal(self.browser.webDriver is None, False)
+        print("Testing initializing the webDriver")
+        assert_equal(self.browser.webDriver is None, True)         
+        self.browser.initialize_browser()
+        time.sleep(5)
+        assert_equal(self.browser.webDriver is None, False)
+        self.browser.webDriver.quit()
 
     def test_stop_browser(self):
+        print("Testing stopping the webDriver")
         if self.browser.webDriver is not None:
-            self.browser.stop_browser
+            self.browser.stop_browser()
 
         assert_equal(self.browser.webDriver is None, True)
 

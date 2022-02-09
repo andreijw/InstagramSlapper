@@ -16,10 +16,8 @@ from explicit import waiter, XPATH
 from time import sleep
 
 # Custom imports
-from Common import Constants
-from Common import StringResources
-from Library import Validation
-from Library import Browser
+from Common import Constants, StringResources
+from Library import Validation, Browser, InstagramController
 
 # Login to the website using the provided credentials username and password
 def login(username, password, browser): 
@@ -185,15 +183,14 @@ def get_thot_rating(browser, account):
     
     return thot_rating
     
-# Runner function for the insta-thot-remover
+# Main entry point for the tool. Can add / remove instagram thots
 def main():
     try:
         print(StringResources.INTRO_TEXT)
         
-        username = ''
-        password = ''
+        username, password = '', ''
         mode = 1
-        browser = Browser.Browser()
+        controller = InstagramController.InstagramController()
         follwing, followers, badFollowers, removeList, cleanList = set(), set(), set(), set(), set()
 
         inputValidator = Validation.Validation()
@@ -208,9 +205,9 @@ def main():
         print(StringResources.VALID_INPUT_DATA)
         
         # Initialize the chrome browser object             
-        browser.initialize_browser()
-        return
+        controller.initialize_controller()
 
+        return
         # Login to insta with the input username and password
         login(username, password, browser)
         sleep(1)
@@ -297,9 +294,8 @@ def main():
     except Exception as e:
         print(StringResources.EXCEPTION_MESSAGE.format(e))
     finally:
-        if browser.webDriver is not None:
             print(StringResources.CLOSING_MESSAGE)
-            browser.stop_browser()
+            controller.stop_controller()
 
 if __name__ == "__main__":
     main()
