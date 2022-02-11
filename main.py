@@ -18,30 +18,7 @@ from time import sleep
 # Custom imports
 from Common import Constants, StringResources
 from Library import Validation, Browser, InstagramController
-
-# Login to the website using the provided credentials username and password
-def login(username, password, browser): 
-    browser.get("https://www.instagram.com/accounts/login/")
-    sleep(3)
-
-    # Login with my credentials
-    browser.find_element_by_name("username").send_keys(username)
-    browser.find_element_by_name("password").send_keys(password)
-    submit = browser.find_element_by_tag_name('form')
-    submit.submit()
-    
-    # Sleep needed to put in the 2 factor code
-    print("Put in 2 fact authentication code if needed")
-    sleep(8)
-    
-    # Click both not now buttons
-    browser.find_elements_by_xpath("//button[contains(text(), 'Not Now')]")[0].click()    
-    browser.find_elements_by_xpath("//button[contains(text(), 'Not Now')]")[0].click()
-    
-    # Wait for the user dashboard page to load
-    WebDriverWait(browser, 15).until(
-        EC.presence_of_element_located((By.LINK_TEXT, "See All")))
-        
+      
 # Function to either get the number of followers / following for an account        
 def get_count_number(account, browser, link, listXPath):
     # Click the Following / Followers link
@@ -207,19 +184,18 @@ def main():
         # Initialize the chrome browser object             
         controller.initialize_controller()
 
-        return
         # Login to insta with the input username and password
-        login(username, password, browser)
-        sleep(1)
-        print("Logged in into the account {0} | password {1} | mode {2}"\
-        .format(username, password, mode))
-        
+        if not controller.do_login(username, password):
+            print(StringResources.FAILED_LOGIN_MESSAGE.format(username, password))
+            return
+
+        print(StringResources.SUCCESFUL_LOGIN_MESSAGE.format(username, password, mode))
+        return
         # Use bitwise operator on the mode to perform the following functionality
         # &1 -> Get Followers of the account
         # &2 -> Get People the account follows
         # &3 -> Get Bad Followers (People that don't follow you back) + &1 & &2 obv
         # &4 -> Read in from local files Followers.txt, Following.txt and BadFollowers.txt
- 
         if mode&1:
             # Use mode 2 in the scrape func to get a list of people that follow an account
             followers = scrape_followers(username, browser, 2)     
