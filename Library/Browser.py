@@ -45,8 +45,7 @@ class Browser:
     def find_element_by_name(self, elementNname):
         self.initialize_browser()
         
-        element = self.webDriver.find_element_by_name(elementNname)
-        return element
+        return self.webDriver.find_element_by_name(elementNname)
         
     '''
     Find the element by it's tag name
@@ -54,18 +53,28 @@ class Browser:
     def find_element_by_tag(self, tagName):
         self.initialize_browser()
         
-        element = self.webDriver.find_element_by_tag_name(tagName)
-        return element
+        return self.webDriver.find_element_by_tag_name(tagName)
         
     '''
-    Finds the first element that contains the input xpath
+    Finds the first n element thats contains the input xpath
     '''
-    def find_element_by_xpath(self, xpath):
+    def find_elements_by_x_path(self, xpath, elements):
         self.initialize_browser()
-            
-        element = self.webDriver.find_elements_by_xpath(xpath)[0]
-        return element
         
+        # Unwrap the element if we only want 1
+        if elements == 1:
+            return self.webDriver.find_elements_by_xpath(xpath)[0]
+            
+        return self.webDriver.find_elements_by_xpath(xpath)[0: elements]
+    
+    '''
+    Finds the first element that contains the input partial link
+    '''
+    def find_element_by_link(self, linkText):
+        self.initialize_browser()
+        
+        return self.webDriver.find_element_by_partial_link_text(linkText)
+
     '''
     Wait for the driver to load the input page
     '''
@@ -74,3 +83,13 @@ class Browser:
         
         WebDriverWait(self.webDriver, waitTime).until(
             EC.presence_of_element_located((By.LINK_TEXT, text)))
+    
+    '''
+    Execute the input script
+    '''
+    def execute_input_script(self, inputScript, additionalText):
+        self.initialize_browser()
+        
+        self.webDriver.execute_script(inputScript, additionalText)
+        
+        

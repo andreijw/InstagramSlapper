@@ -31,6 +31,13 @@ INSTAGRAM_IDDLE_WAIT_SECONDS = 3
 INSTAGRAM_LOGIN_LOAD_WAIT_SECONDS = 15
 INSTAGRAM_LOGIN_FORM_NAME = "form"
 INSTAGRAM_NOT_NOW_BUTTON_XPATH = "//button[contains(text(), 'Not Now')]"
+INSTAGRAM_FOLLOWERS_LINK_NAME = "followers"
+INSTAGRAM_FOLLOWING_LINK_NAME = "following"
+INSTAGRAM_FOLLOWERS_X_PATH = "//li[2]/a/span"
+INSTAGRAM_FOLLOWING_X_PATH = "//li[3]/a/span"
+INSTAGRAM_PEOPLE_COUNT_DIV = "//div[@role='dialog']"
+INSTAGRAM_PEOPLE_CSS = "ul div li:nth-child({}) a.notranslate"
+INSTAGRAM_MODAL_SCOLL_TEXT = "arguments[0].scrollIntoView();"
 
 #Browser
 INSTAGRAM_SEE_ALL_NAME = "See All"

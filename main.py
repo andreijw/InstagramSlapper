@@ -12,69 +12,11 @@ import shutil
 import sys
 
 from bs4 import BeautifulSoup as bs
-from explicit import waiter, XPATH
 from time import sleep
 
 # Custom imports
 from Common import Constants, StringResources
 from Library import Validation, Browser, InstagramController
-      
-# Function to either get the number of followers / following for an account        
-def get_count_number(account, browser, link, listXPath):
-    # Click the Following / Followers link
-    browser.find_element_by_partial_link_text(link).click()    
-    # Wait for the modal to load    
-    waiter.find_element(browser, "//div[@role='dialog']", by=XPATH)    
-    totalCount = int((browser.find_element_by_xpath(listXPath).text).replace(',',''))
-    
-    return totalCount
- 
-# Scrape the followers/people that follow you for a given account
-# 2 Modes -> 1 To get the people that follow you
-#         -> 2 To get the people you follow
-def scrape_followers(account, browser, mode):
-    #Load the page for the account
-    print("Loading the account {0}".format(account))
-    browser.get("https://www.instagram.com/{0}/".format(account))
-    
-    link = ""
-    listXPath = ""
-    
-    # If mode == 1 get the people that follow you, else the people you follow
-    if mode == 1:
-        print("\tLoading the people that I follow")
-        link = "following"
-        listXPath = "//li[3]/a/span"
-        print("\tFollowing found -> ")
-    else:
-        print("\tLoading the people that follow me")
-        link = "followers"    
-        listXPath= "//li[2]/a/span"
-        print("\tFollowers found ->")
-    
-    totalCount = get_count_number(account, browser, link, listXPath)
-    print("\t{0}".format(totalCount))
-    
-    # Use CSS to get the nth children
-    followerCss = "ul div li:nth-child({}) a.notranslate" 
-    peopleSet = set()
-
-    # Create and return a set of all the following/followers
-    # We need to scroll the modal in order for the next few followers to load
-    try:
-        for followerIndex in range(1, totalCount):
-            follower = waiter.find_element(browser, followerCss.format(followerIndex))
-            followerName = follower.text
-            peopleSet.add(followerName)
-            print("follower {0} is - {1}".format(followerIndex, followerName))
-
-            browser.execute_script("arguments[0].scrollIntoView();", follower)
-
-    except Exception as e:
-        # Sometimes instagram lies, and the follower count is wrong
-        print("Insta lied to me {0}".format(type(e).__name__))
-    finally:
-        return peopleSet
     
 # Function to unfollow the given person
 def unfollow_person(account, browser):
@@ -95,7 +37,7 @@ def write_output_to_file(peopleSet, outputFile):
         for follower in peopleSet:
             f.write("%s\n" % follower)
     
-    print("Wrote the content to the file - {0}".format(outputFile))
+    print(StringResources.INSTAGRAM_TEXT_OUTPUT_MESSAGE.format(outputFile))
     sleep(1)
 
 # Function to download an image from the source path    
@@ -190,7 +132,7 @@ def main():
             return
 
         print(StringResources.SUCCESFUL_LOGIN_MESSAGE.format(username, password, mode))
-        return
+
         # Use bitwise operator on the mode to perform the following functionality
         # &1 -> Get Followers of the account
         # &2 -> Get People the account follows
@@ -198,14 +140,14 @@ def main():
         # &4 -> Read in from local files Followers.txt, Following.txt and BadFollowers.txt
         if mode&1:
             # Use mode 2 in the scrape func to get a list of people that follow an account
-            followers = scrape_followers(username, browser, 2)     
-            print("The total account followers are: ", len(followers))
-            write_output_to_file(followers, followersFile)
+            followers = controller.scrape_account_people(username, mode)     
+            print(StringResources.INSTAGRAM_TOTAL_FOLLOWERS_TEXT.format(len(followers)))
+            write_output_to_file(followers, Constants.FOLLOWERS_FILE_PATH)
             
             if (mode ^ 1) == 0:
-                print("Mode is set to 1. Only obtaining the followers set")
+                print(StringResources.INSTAGRAM_MODE_ONE_MESSAGE)
                 return
-        
+        return
         if mode&2:
             # Get the people that the account follows
             following = scrape_followers(username, browser, 1)
