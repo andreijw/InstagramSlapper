@@ -21,6 +21,7 @@ class Browser:
     '''
     def initialize_browser(self):
         if self.webDriver is None:
+            print("Initializing the browser")
             self.webDriver = webdriver.Chrome(executable_path=Constants.CHORMIUM_DRIVER_PATH)
             self.webDriver.implicitly_wait(5)
     

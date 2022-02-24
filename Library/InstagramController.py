@@ -85,9 +85,13 @@ class InstagramController:
             listXPath = Constants.INSTAGRAM_FOLLOWING_X_PATH
             print(StringResources.INSTAGRAM_FOUND_FOLLOWING_MESSAGE)
 
-        totalCount = self.get_count_number(account, link, listXPath)
-        print("\t{0}".format(totalCount))
+        totalCount = self.get_count_number(account, listXPath)
+        print("\t{0}\n".format(totalCount))
     
+        # Click the Following / Followers link
+        self.Browser.find_element_by_link(link).click()
+        waiter.find_element(self.Browser.webDriver, Constants.INSTAGRAM_PERSON_MODAL_XPATH, by=XPATH)
+        
         # Use CSS to get the nth children
         followerCss = Constants.INSTAGRAM_PEOPLE_CSS 
         peopleSet = set()
@@ -96,7 +100,7 @@ class InstagramController:
         # We need to scroll the modal in order for the next few followers to load
         try:
             for followerIndex in range(1, totalCount):
-                follower = waiter.find_element(self.Browser.webDriver, Constants.followerCss.format(followerIndex))
+                follower = waiter.find_element(self.Browser.webDriver, followerCss.format(followerIndex))
                 followerName = follower.text
                 peopleSet.add(followerName)
                 print(StringResources.INSTAGRAM_PERSON_ITEM_TEXT.format(followerIndex, followerName))
@@ -105,7 +109,7 @@ class InstagramController:
 
         except Exception as e:
             # Sometimes instagram lies, and the follower count is wrong
-            print(StringResources.INSTAGRAM_LIES_TEXT.format(type(e).__name__))
+            print(StringResources.INSTAGRAM_LIES_TEXT.format(e))
         finally:
             return peopleSet
         
@@ -113,12 +117,8 @@ class InstagramController:
     Gets the following or followers count for the input account.
     Takes in the username, linkName and linkXPath
     '''    
-    def get_count_number(self, account, link, listXPath):
-        # Click the Following / Followers link
-        self.Browser.find_element_by_link(link).click()    
-        
-        # Wait for the modal to load    
-        waiter.find_element(self.Browser.webDriver, Constants.INSTAGRAM_PEOPLE_COUNT_DIV, by=XPATH)    
-        totalCount = int((self.Browser.find_elements_by_x_path(listXPath, 1).text).replace(',',''))
+    def get_count_number(self, account, listXPath):        
+        element = self.Browser.find_elements_by_x_path(listXPath, 1)
+        totalCount = int((element.text).replace(',',''))
     
         return totalCount
