@@ -4,14 +4,8 @@ And remove anyone that does not follow me back
 '''
 
 # Standard Imports
-import itertools
-import json
-import os
-import requests
-import shutil
 import sys
 
-from bs4 import BeautifulSoup as bs
 from time import sleep
 
 # Custom imports
@@ -42,12 +36,15 @@ def write_output_to_file(peopleSet, outputFile):
 
 # Function to download an image from the source path    
 def download_image(urlPath, destPath):
+#import requests
     img_content = requests.get(urlPath).content
     with open(destPath, 'wb') as handler:
         handler.write(img_content)
 
 # Function to get the profile pic and the first 4 human posts
 def get_images(browser, account):
+#import shutil
+#import os
     account = "andrei_j_w"
     print("Getting images from the account {0}".format(account))
     tags = set()
@@ -133,63 +130,60 @@ def main():
 
         print(StringResources.SUCCESFUL_LOGIN_MESSAGE.format(username, password, mode))
 
-        # Use bitwise operator on the mode to perform the following functionality
-        # &1 -> Get Followers of the account
-        # &2 -> Get People the account follows
-        # &3 -> Get Bad Followers (People that don't follow you back) + &1 & &2 obv
-        # &4 -> Read in from local files Followers.txt, Following.txt and BadFollowers.txt
+        # Modes -
+        # 1 -> Get Followers of the account
+        # 2 -> Get People the account follows
+        # 3 -> Get Bad Followers (People that don't follow you back) + &1 & &2 obv
+        # 4 -> Read in from local files Followers.txt, Following.txt and BadFollowers.txt
+        # 8 ->
         if mode&1:
-            # Use mode 2 in the scrape func to get a list of people that follow an account
-            followers = controller.scrape_account_people(username, mode)     
+            followers = controller.scrape_account_people(username, 1)     
             print(StringResources.INSTAGRAM_TOTAL_FOLLOWERS_TEXT.format(len(followers)))
             write_output_to_file(followers, Constants.FOLLOWERS_FILE_PATH)
             
             if (mode ^ 1) == 0:
                 print(StringResources.INSTAGRAM_MODE_ONE_MESSAGE)
                 return
-        return
+
         if mode&2:
             # Get the people that the account follows
-            following = scrape_followers(username, browser, 1)
-            print("Number of people the account follows", len(following))
-            write_output_to_file(following, followingFile)
+            following = controller.scrape_account_people(username, 2)
+            print(StringResources.INSTAGRAM_TOTAL_FOLLOWING_TEXT.format(len(following)))
+            write_output_to_file(following, Constants.FOLLOWING_FILE_PATH)
             
             if (mode ^ 2) == 0:
-                print("Mode is set to 2. Only obtaining the following set")
+                print(StringResources.INSTAGRAM_MODE_TWO_MESSAGE)
                 return
 
         if mode&3:
-            # Set A is my followers, set B is the people I follow
-            # A bad follower is defined by me as someone that I follow but does not follow me back
-            # We can easily find this with Set Theory. Set Difference B - A
-            # which will be all the elements in Set B (I follow) and are not in Set A (follow me)
-            print("Getting people that don't follow me back")
+            # A bad follower is defined by me as someone followed by the account that
+            # does not follow the account back
+            # We can easily find this with Set Theory. Set Difference Following - Followers
+            print(StringResources.INSTAGRAM_BAD_FOLLOWERS_MESSAGE)
             badFollowers = following - followers
-            print("Number of people not following me", len(badFollowers))
-            write_output_to_file(badFollowers, badFollowersFile)
+            print(StringResources.INSTAGRAM_TOTAL_BAD_FOLLOWERS_TEXT.format(len(badFollowers)))
+            write_output_to_file(badFollowers, Constants.BAD_FOLLOWERS_FILE_PATH)
             
             if (mode ^ 3) == 0:
-                print("Mode is set to 3. Only obtaining the badFollowers set")
+                print(StringResources.INSTAGRAM_MODE_THREE_MESSAGE)
                 return
         
         # Read in the clean list of people not to unfollow
-        cleanList = set(line.strip() for line in open(cleanListFile))
+        cleanList = set(line.strip() for line in open(Constants.CLEAN_LIST_FILE_PATH))
         
         if mode&4:
-            print("Mode set to 4, reading in from the files")
+            print(Constants.INSTAGRAM_MODE_FOUR_MESSAGE)
             followers = set(line.strip() for line in open(followersFile))
-            print("Length of followers set - {0}".format(len(followers)))
+            print(StringResources.INSTAGRAM_FOLLOWER_SET_SIZE.format(len(followers)))
             following = set(line.strip() for line in open(followingFile))
-            print("Length of following set - {0}".format(len(following)))
+            print(StringResources.INSTAGRAM_FOLLOWING_SET_SIZE.format(len(following)))
             badFollowers = set(line.strip() for line in open(badFollowersFile))
-            print("Length of badFollowers set - {0}".format(len(badFollowers)))
-        
-        print("Logging in into the account {0} | password {1} | running with mode {2}"\
-        .format(username, password, mode))
-            
+            print(INSTAGRAM_BAD_FOLLOWER_SET_SIZE.format(len(badFollowers)))
+
         removeList = badFollowers - cleanList
-        print("Filtered out the clean list followers about to remove {0}".format(len(removeList)))
+        print(StringResources.INSTAGRAM_REMOVE_LIST_SIZE.format(len(removeList)))
         
+        return
         # I think insta will action lock the account if we remove more than 600 people
         for person in removeList:
             unfollow_person(person, browser)
