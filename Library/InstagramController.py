@@ -122,3 +122,19 @@ class InstagramController:
         totalCount = int((element.text).replace(',',''))
     
         return totalCount
+
+    '''
+    Unfollow the input account. Must already be logged into an insta account
+    '''
+    def unfollow_person(self, account):
+    #Load their page and unfollow them
+    self.Browser.get(Constants.INSTAGRAM_FORMATTABLE_URL.format(account))
+    
+    print(StringResources.INSTAGRAM_UNFOLLOW_ACCOUNT_TEXT.format(account))
+    try:
+        #func in browser
+        WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, "//*[contains(@aria-label, 'Following')]"))).click()
+         self.Browser.find_elements_by_x_path(Constants.INSTAGRAM_UNFOLLOW_XPATH, 1).click()
+    except Exception as e:
+        print(StringResources.INSTAGRAM_UNFOLLOW_ERROR_MESSAGE.format(account, e))
+        return

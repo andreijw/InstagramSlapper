@@ -1,29 +1,19 @@
 '''
-Code to open up my instagram, pull the list of all my followers, and those whom I followers
-And remove anyone that does not follow me back
+This script can get the insta followers for an account.
+The people that the account follows.
+The bad followers for an account.
+Unfollow bad followers for an account.
+Get an account's thot score.
 '''
 
 # Standard Imports
 import sys
-
+import random
 from time import sleep
 
 # Custom imports
 from Common import Constants, StringResources
 from Library import Validation, Browser, InstagramController
-    
-# Function to unfollow the given person
-def unfollow_person(account, browser):
-    #Load their page and unfollow them
-    browser.get("https://www.instagram.com/{0}/".format(account))
-    
-    print("\tUnfollowing {0}".format(account))
-    try:
-        WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, "//*[contains(@aria-label, 'Following')]"))).click()
-        browser.find_element_by_xpath("//button[contains(text(), 'Unfollow')]").click()
-    except Exception as e:
-        print("Error unfollowing - {0} | {1}".format(account, e))
-        return
 
 # Write the input peopleSet into the output text file
 def write_output_to_file(peopleSet, outputFile):
@@ -167,32 +157,31 @@ def main():
             if (mode ^ 3) == 0:
                 print(StringResources.INSTAGRAM_MODE_THREE_MESSAGE)
                 return
-        
-        # Read in the clean list of people not to unfollow
-        cleanList = set(line.strip() for line in open(Constants.CLEAN_LIST_FILE_PATH))
-        
+
         if mode&4:
-            print(Constants.INSTAGRAM_MODE_FOUR_MESSAGE)
-            followers = set(line.strip() for line in open(followersFile))
+            print(StringResources.INSTAGRAM_MODE_FOUR_MESSAGE_START)
+            followers = set(line.strip() for line in open(Constants.FOLLOWERS_FILE_PATH))
             print(StringResources.INSTAGRAM_FOLLOWER_SET_SIZE.format(len(followers)))
-            following = set(line.strip() for line in open(followingFile))
+            following = set(line.strip() for line in open(Constants.FOLLOWING_FILE_PATH))
             print(StringResources.INSTAGRAM_FOLLOWING_SET_SIZE.format(len(following)))
-            badFollowers = set(line.strip() for line in open(badFollowersFile))
-            print(INSTAGRAM_BAD_FOLLOWER_SET_SIZE.format(len(badFollowers)))
+            badFollowers = set(line.strip() for line in open(Constants.BAD_FOLLOWERS_FILE_PATH))
+            print(StringResources.INSTAGRAM_BAD_FOLLOWER_SET_SIZE.format(len(badFollowers)))
+            cleanList = set(line.strip() for line in open(Constants.CLEAN_LIST_FILE_PATH))
+            print(StringResources.INSTAGRAM_CLEAN_LIST_SET_SIZE.format(len(cleanList)))
 
         removeList = badFollowers - cleanList
         print(StringResources.INSTAGRAM_REMOVE_LIST_SIZE.format(len(removeList)))
         
-        return
         # I think insta will action lock the account if we remove more than 600 people
         for person in removeList:
-            unfollow_person(person, browser)
-            sleep(10)
+            controller.unfollow_person(person)
+            sleep(2 + random.gauss(3,2))
         
         if (mode ^ 4) == 0:
-            print("Mode was set to 4. Exiting after removing the bad followers")
+            print(StringResources.INSTAGRAM_MODE_FOUR_MESSAGE)
             return
-            
+        
+        return
         if mode&8:
             # Remove thots
             # For now we will only look at 1 profile

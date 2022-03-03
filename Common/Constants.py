@@ -39,6 +39,7 @@ INSTAGRAM_PEOPLE_COUNT_DIV = "//div[@role='dialog']"
 INSTAGRAM_PEOPLE_CSS = "ul div li:nth-child({}) a.notranslate"
 INSTAGRAM_MODAL_SCOLL_TEXT = "arguments[0].scrollIntoView();"
 INSTAGRAM_PERSON_MODAL_XPATH = "//div[@role='dialog']"
+INSTAGRAM_UNFOLLOW_XPATH = "//button[contains(text(), 'Unfollow')]"
 
 #Browser
 INSTAGRAM_SEE_ALL_NAME = "See All"

@@ -77,7 +77,7 @@ class Browser:
         return self.webDriver.find_element_by_partial_link_text(linkText)
 
     '''
-    Wait for the driver to load the input page
+    Wait for the driver to load the input page using the mode
     '''
     def web_driver_wait(self, waitTime, text):
         self.initialize_browser()
