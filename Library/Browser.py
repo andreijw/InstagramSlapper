@@ -75,11 +75,20 @@ class Browser:
         self.initialize_browser()
         
         return self.webDriver.find_element_by_partial_link_text(linkText)
+        
+    '''
+    Wait for the driver to load the elment with the input xpath
+    '''
+    def web_driver_wait_xpath(self, waitTime, text):
+        self.initialize_browser()
+        
+        return WebDriverWait(self.webDriver, waitTime).until(
+            EC.presence_of_element_located((By.XPATH, text)))
 
     '''
     Wait for the driver to load the input page using the mode
     '''
-    def web_driver_wait(self, waitTime, text):
+    def web_driver_wait_link_text(self, waitTime, text):
         self.initialize_browser()
         
         WebDriverWait(self.webDriver, waitTime).until(

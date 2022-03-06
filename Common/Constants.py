@@ -40,6 +40,8 @@ INSTAGRAM_PEOPLE_CSS = "ul div li:nth-child({}) a.notranslate"
 INSTAGRAM_MODAL_SCOLL_TEXT = "arguments[0].scrollIntoView();"
 INSTAGRAM_PERSON_MODAL_XPATH = "//div[@role='dialog']"
 INSTAGRAM_UNFOLLOW_XPATH = "//button[contains(text(), 'Unfollow')]"
+INSTAGRAM_UNFOLLOW__LOAD_XPATH = "//*[contains(@aria-label, 'Following')]"
+INSTAGRAM_UNFOLLOW_WAIT_SECONDS = 2
 
 #Browser
 INSTAGRAM_SEE_ALL_NAME = "See All"

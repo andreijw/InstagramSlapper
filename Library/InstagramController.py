@@ -51,7 +51,7 @@ class InstagramController:
             self.Browser.find_elements_by_x_path(Constants.INSTAGRAM_NOT_NOW_BUTTON_XPATH, 1).click()
             
             # Wait for the user dashboard page to load
-            self.Browser.web_driver_wait(Constants.INSTAGRAM_LOGIN_LOAD_WAIT_SECONDS, Constants.INSTAGRAM_SEE_ALL_NAME)
+            self.Browser.web_driver_wait_link_text(Constants.INSTAGRAM_LOGIN_LOAD_WAIT_SECONDS, Constants.INSTAGRAM_SEE_ALL_NAME)
             
             return True
 
@@ -127,14 +127,14 @@ class InstagramController:
     Unfollow the input account. Must already be logged into an insta account
     '''
     def unfollow_person(self, account):
-    #Load their page and unfollow them
-    self.Browser.get(Constants.INSTAGRAM_FORMATTABLE_URL.format(account))
-    
-    print(StringResources.INSTAGRAM_UNFOLLOW_ACCOUNT_TEXT.format(account))
-    try:
-        #func in browser
-        WebDriverWait(browser, 2).until(EC.presence_of_element_located((By.XPATH, "//*[contains(@aria-label, 'Following')]"))).click()
-         self.Browser.find_elements_by_x_path(Constants.INSTAGRAM_UNFOLLOW_XPATH, 1).click()
-    except Exception as e:
-        print(StringResources.INSTAGRAM_UNFOLLOW_ERROR_MESSAGE.format(account, e))
-        return
+        #Load their page and unfollow them
+        self.Browser.get_website(Constants.INSTAGRAM_FORMATTABLE_URL.format(account))
+
+        print(StringResources.INSTAGRAM_UNFOLLOW_ACCOUNT_TEXT.format(account))
+        try:
+            #func in browser
+            self.Browser.web_driver_wait_xpath(Constants.INSTAGRAM_UNFOLLOW_WAIT_SECONDS, Constants.INSTAGRAM_UNFOLLOW__LOAD_XPATH).click()
+            self.Browser.find_elements_by_x_path(Constants.INSTAGRAM_UNFOLLOW_XPATH, 1).click()
+        except Exception as e:
+            print(StringResources.INSTAGRAM_UNFOLLOW_ERROR_MESSAGE.format(account, e))
+            return

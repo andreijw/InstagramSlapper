@@ -175,7 +175,12 @@ def main():
         # I think insta will action lock the account if we remove more than 600 people
         for person in removeList:
             controller.unfollow_person(person)
-            sleep(2 + random.gauss(3,2))
+
+            sleep_time = 2 + random.gauss(3,2)
+            if (sleep_time < 0):
+                sleep_time = 2.2
+                
+            sleep(sleep_time)
         
         if (mode ^ 4) == 0:
             print(StringResources.INSTAGRAM_MODE_FOUR_MESSAGE)
