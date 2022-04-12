@@ -108,8 +108,7 @@ class InstagramController:
                 self.Browser.execute_input_script(Constants.INSTAGRAM_MODAL_SCOLL_TEXT, follower)
 
         except Exception as e:
-            # Sometimes instagram lies, and the follower count is wrong
-            print(StringResources.INSTAGRAM_LIES_TEXT.format(e))
+            pass
         finally:
             return peopleSet
         
@@ -133,7 +132,7 @@ class InstagramController:
         print(StringResources.INSTAGRAM_UNFOLLOW_ACCOUNT_TEXT.format(account))
         try:
             #func in browser
-            self.Browser.web_driver_wait_xpath(Constants.INSTAGRAM_UNFOLLOW_WAIT_SECONDS, Constants.INSTAGRAM_UNFOLLOW__LOAD_XPATH).click()
+            self.Browser.web_driver_wait_xpath(Constants.INSTAGRAM_UNFOLLOW_WAIT_SECONDS, Constants.INSTAGRAM_UNFOLLOW_LOAD_XPATH).click()
             self.Browser.find_elements_by_x_path(Constants.INSTAGRAM_UNFOLLOW_XPATH, 1).click()
         except Exception as e:
             print(StringResources.INSTAGRAM_UNFOLLOW_ERROR_MESSAGE.format(account, e))

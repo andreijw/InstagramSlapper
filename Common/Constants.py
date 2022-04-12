@@ -14,6 +14,7 @@ FOLLOWERS_FILE_PATH = "./Output/Followers.txt"
 FOLLOWING_FILE_PATH = "./Output/Following.txt"
 CLEAN_LIST_FILE_PATH = "./Output/CleanList.txt"
 BAD_FOLLOWERS_FILE_PATH = "./Output/BadFollowers.txt"
+REFOLLOW_FILE_PATH = "./Output/Refollow.txt"
 
 # Validation
 INSTAGRAM_USERNAME_REGEX = "^[A-Za-z0-9_\.]*$"
@@ -40,7 +41,7 @@ INSTAGRAM_PEOPLE_CSS = "ul div li:nth-child({}) a.notranslate"
 INSTAGRAM_MODAL_SCOLL_TEXT = "arguments[0].scrollIntoView();"
 INSTAGRAM_PERSON_MODAL_XPATH = "//div[@role='dialog']"
 INSTAGRAM_UNFOLLOW_XPATH = "//button[contains(text(), 'Unfollow')]"
-INSTAGRAM_UNFOLLOW__LOAD_XPATH = "//*[contains(@aria-label, 'Following')]"
+INSTAGRAM_UNFOLLOW_LOAD_XPATH = "//*[contains(@aria-label, 'Following')]"
 INSTAGRAM_UNFOLLOW_WAIT_SECONDS = 2
 
 #Browser

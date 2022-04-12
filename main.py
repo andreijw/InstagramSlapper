@@ -9,6 +9,7 @@ Get an account's thot score.
 # Standard Imports
 import sys
 import random
+from os.path import exists
 from time import sleep
 
 # Custom imports
@@ -23,6 +24,17 @@ def write_output_to_file(peopleSet, outputFile):
     
     print(StringResources.INSTAGRAM_TEXT_OUTPUT_MESSAGE.format(outputFile))
     sleep(1)
+    
+# Read Input file into a set. Returns an empty set on error
+def read_input_file_to_set(inputFile):
+    try:
+        if not exists(inputFile):
+            return set()
+        
+        return set(line.strip() for line in open(inputFile))
+    except Exception as e:
+        print(Strings.INSTAGRAM_FILE_READ_ERROR, e)
+        return set()
 
 # Function to download an image from the source path    
 def download_image(urlPath, destPath):
@@ -154,24 +166,28 @@ def main():
             print(StringResources.INSTAGRAM_TOTAL_BAD_FOLLOWERS_TEXT.format(len(badFollowers)))
             write_output_to_file(badFollowers, Constants.BAD_FOLLOWERS_FILE_PATH)
             
+            refollowList = read_input_file_to_set(Constants.REFOLLOW_FILE_PATH)
+            refollowList = refollowList.union(badFollowers)
+            write_output_to_file(refollowList, Constants.REFOLLOW_FILE_PATH)
+            
             if (mode ^ 3) == 0:
                 print(StringResources.INSTAGRAM_MODE_THREE_MESSAGE)
                 return
 
         if mode&4:
             print(StringResources.INSTAGRAM_MODE_FOUR_MESSAGE_START)
-            followers = set(line.strip() for line in open(Constants.FOLLOWERS_FILE_PATH))
+            followers = read_input_file_to_set(Constants.FOLLOWERS_FILE_PATH)
             print(StringResources.INSTAGRAM_FOLLOWER_SET_SIZE.format(len(followers)))
-            following = set(line.strip() for line in open(Constants.FOLLOWING_FILE_PATH))
+            following = read_input_file_to_set(Constants.FOLLOWING_FILE_PATH)
             print(StringResources.INSTAGRAM_FOLLOWING_SET_SIZE.format(len(following)))
-            badFollowers = set(line.strip() for line in open(Constants.BAD_FOLLOWERS_FILE_PATH))
+            badFollowers = read_input_file_to_set(Constants.BAD_FOLLOWERS_FILE_PATH)
             print(StringResources.INSTAGRAM_BAD_FOLLOWER_SET_SIZE.format(len(badFollowers)))
-            cleanList = set(line.strip() for line in open(Constants.CLEAN_LIST_FILE_PATH))
+            cleanList = read_input_file_to_set(Constants.CLEAN_LIST_FILE_PATH)
             print(StringResources.INSTAGRAM_CLEAN_LIST_SET_SIZE.format(len(cleanList)))
 
         removeList = badFollowers - cleanList
         print(StringResources.INSTAGRAM_REMOVE_LIST_SIZE.format(len(removeList)))
-        
+
         # I think insta will action lock the account if we remove more than 600 people
         for person in removeList:
             controller.unfollow_person(person)
@@ -185,8 +201,7 @@ def main():
         if (mode ^ 4) == 0:
             print(StringResources.INSTAGRAM_MODE_FOUR_MESSAGE)
             return
-        
-        return
+
         if mode&8:
             # Remove thots
             # For now we will only look at 1 profile
