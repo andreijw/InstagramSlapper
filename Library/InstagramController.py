@@ -1,5 +1,5 @@
 """
-Validation.py
+InstagramController.py
 
 This file will serve to control the instagram website through the webDriver
 """
@@ -8,11 +8,12 @@ from explicit import waiter, XPATH
 from time import sleep
 
 from Common import Constants, StringResources
-from Library import Browser
+from Library import Browser, ImageManipulator
 
 class InstagramController:
     def __init__(self):
         self.Browser = None
+        self.ImageManipulator = None
 
     ''' 
     Initialize the instagram controller, and webDriver and save the instance
@@ -20,6 +21,8 @@ class InstagramController:
     def initialize_controller(self):
          self.Browser = Browser.Browser()
          self.Browser.initialize_browser()
+         
+         self.ImageManipulator = ImageManipulator.ImageManipulator()
 
     '''
     Stop the controller and quit the webdriver browser
@@ -137,3 +140,24 @@ class InstagramController:
         except Exception as e:
             print(StringResources.INSTAGRAM_UNFOLLOW_ERROR_MESSAGE.format(account, e))
             return
+
+    '''
+    Obtain the thot score for the input account
+    The current metrics are follower count, following count, followerRatio, commonly used
+    hashtags, last captions, skin pixel ratio, post frequency
+    '''
+    def get_thot_rating(self, account):
+        return 0
+        # Calculate a weighted average thot_rating score of the profile pic + 4 images
+        # Get post frequency in last month, tags thot_ratinga and captions thot_rating
+        tags, captions, post_frequency = self.ImageManipulator.get_images_metadata(account)
+        
+        # Get follower / following ratio
+        followerCount = self.get_count_number(account, Constants.INSTAGRAM_FOLLOWERS_X_PATH)
+        followingCount = self.get_count_number(account, Constants.INSTAGRAM_FOLLOWING_X_PATH)
+        followerRatio = followerCount / followingCount
+        
+        # Run through the model
+        thot_rating = followerRatio
+        
+        return thot_rating
