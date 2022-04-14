@@ -44,5 +44,11 @@ INSTAGRAM_UNFOLLOW_XPATH = "//button[contains(text(), 'Unfollow')]"
 INSTAGRAM_UNFOLLOW_LOAD_XPATH = "//*[contains(@aria-label, 'Following')]"
 INSTAGRAM_UNFOLLOW_WAIT_SECONDS = 2
 
-#Browser
+# Browser
 INSTAGRAM_SEE_ALL_NAME = "See All"
+
+# Image Manipulator
+IMAGE_TEMP_DIRECTORY = "./images"
+IMAGE_SOURCE_XPATH = "//img[contains(@class,'_6q-tv')]"
+IMAGE_SOURCE_ATTRIBUTE = "src"
+IMAGE_DOWNLOAD_PROFILE_NAME = "{0}/profile.png"

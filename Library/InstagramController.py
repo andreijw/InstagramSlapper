@@ -146,12 +146,12 @@ class InstagramController:
     The current metrics are follower count, following count, followerRatio, commonly used
     hashtags, last captions, skin pixel ratio, post frequency
     '''
-    def get_thot_rating(self, account):
-        return 0
+    def get_thot_rating(self, account):           
         # Calculate a weighted average thot_rating score of the profile pic + 4 images
         # Get post frequency in last month, tags thot_ratinga and captions thot_rating
-        tags, captions, post_frequency = self.ImageManipulator.get_images_metadata(account)
+        tags, captions, post_frequency = self.ImageManipulator.get_images_metadata(account, self.Browser)
         
+        return post_frequency
         # Get follower / following ratio
         followerCount = self.get_count_number(account, Constants.INSTAGRAM_FOLLOWERS_X_PATH)
         followingCount = self.get_count_number(account, Constants.INSTAGRAM_FOLLOWING_X_PATH)

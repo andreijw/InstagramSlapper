@@ -46,3 +46,6 @@ INSTAGRAM_MODE_FOUR_MESSAGE = "Mode is set to 4. Unfollowed all the bad follower
 INSTAGRAM_UNFOLLOW_ERROR_MESSAGE = "Error unfollowing - {0} | {1}"
 INSTAGRAM_INSPECT_ACCOUNT = "Inspecting the following account for thotness - {0}"
 INSTAGRAM_IMAGE_DOWNLOAD_ERROR = "Error while downloading the profile image - {0} | {1}"
+INSTAGRAM_PROCESSING_METADATA_MESSAGE = "Getting images and metadata from the account {0}"
+INSTAGRAM_IMAGE_DIR_CREATION_ERROR = "Error while creating the image dir | {0}"
+INSTAGRAM_IMAGE_DIR_DELETION_ERROR = "Error while deleting the image dir | {0}"
