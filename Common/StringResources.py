@@ -49,3 +49,7 @@ INSTAGRAM_IMAGE_DOWNLOAD_ERROR = "Error while downloading the profile image - {0
 INSTAGRAM_PROCESSING_METADATA_MESSAGE = "Getting images and metadata from the account {0}"
 INSTAGRAM_IMAGE_DIR_CREATION_ERROR = "Error while creating the image dir | {0}"
 INSTAGRAM_IMAGE_DIR_DELETION_ERROR = "Error while deleting the image dir | {0}"
+INSTAGRAM_IMAGE_DOWNLOAD_COMPLETE = "Downloaded the profile pic and first 4 image potsts"
+INSTAGRAM_DOWNLOADED_PROFILE_PIC = "Downloaded the profile picture"
+INSAGRAM_DOWNLOADED_POST_PICS = "Downloaded the post pictures"
+INSTAGRAM_OBTAIN_POST_FREQUENCY = "Obtained the post frequency"

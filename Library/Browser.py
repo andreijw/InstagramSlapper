@@ -61,7 +61,7 @@ class Browser:
     '''
     def find_elements_by_x_path(self, xpath, elements):
         self.initialize_browser()
-        
+
         # Unwrap the element if we only want 1
         if elements == 1:
             return self.webDriver.find_elements_by_xpath(xpath)[0]

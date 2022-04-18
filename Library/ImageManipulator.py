@@ -38,7 +38,9 @@ class ImageManipulator:
     '''    
     def download_image(self, urlPath, destPath):
         try:
+            print("getting image")
             img_content = requests.get(urlPath).content
+            print("downloaded the image")
             with open(destPath, 'wb') as handler:
                 handler.write(img_content)
         except Exception as e:
@@ -60,26 +62,32 @@ class ImageManipulator:
             browser.get_website(Constants.INSTAGRAM_FORMATTABLE_URL.format(account))
             source_url = browser.find_elements_by_x_path(Constants.IMAGE_SOURCE_XPATH, 1).get_attribute(Constants.IMAGE_SOURCE_ATTRIBUTE)
             self.download_image(source_url, Constants.IMAGE_DOWNLOAD_PROFILE_NAME.format(Constants.IMAGE_TEMP_DIRECTORY))
-            
+
+            print(StringResources.INSTAGRAM_DOWNLOADED_PROFILE_PIC)
+            images = browser.find_elements_by_x_path(Constants.POSTED_IMAGES_XPATH, 4)
+            print(images)
             sleep(3)
-            return (set(), set(), 1) 
-            images = browser.find_elements_by_xpath("//img[contains(@class,'FFVAD')]")
+            
             stop_index = 4
             # Get the first images available up to the stop_index
             for count, image in enumerate(images):
-                source_url = image.get_attribute("src")
-                download_image(source_url, "{0}/image{1}.png".format(Constants.IMAGE_TEMP_DIRECTORY, count))
+                source_url = image.get_attribute(Constants.IMAGE_SOURCE_ATTRIBUTE)
+                print("source url is - ", source_url)
+                dest_path = Constants.DOWNLOADABLE_POST_PICTURE.format(Constants.IMAGE_TEMP_DIRECTORY, count)
+                print("dest path is - ", dest_path)
+                self.download_image(source_url, dest_path)
                 
                 if count >= stop_index:
                     break
-            
-            print("Downloaded the profile pic and first 4 image potsts")
+
+            print(StringResources.INSAGRAM_DOWNLOADED_POST_PICS)
+            print(StringResources.INSTAGRAM_IMAGE_DOWNLOAD_COMPLETE)
             
             self.delete_image_dir()
             return (tags, captions, post_frequency)
 
         except Exception as e:
-            print("Error while getting the account images {0}".format(e))
+            print(StringResources.INSTAGRAM_IMAGE_DOWNLOAD_ERROR.format(e))
         
         self.delete_image_dir()
         return (set(), set(), 0)
